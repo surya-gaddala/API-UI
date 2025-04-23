@@ -5,7 +5,8 @@ import {
 } from '@mui/material';
 import RequestForm from './components/RequestForm';
 import ResponseDisplay from './components/ResponseDisplay';
-import CollectionViewer from 'src\components\CollectionViewer';
+import CollectionViewer from "./components/collectionviewer";
+
 
 const darkTheme = createTheme({
   palette: {

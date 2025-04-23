@@ -11,7 +11,7 @@ import {
   Backup as BackupIcon,
   Restore as RestoreIcon
 } from '@mui/icons-material';
-import { exportCollections, importCollections } from '../src/utils/collectionManager';
+import { exportCollections, importCollections } from '../utils/collectionmanager';
 
 const ImportExportBar = ({ onImportSuccess }) => {
   const fileInputRef = useRef(null);
