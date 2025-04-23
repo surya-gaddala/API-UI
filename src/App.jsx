@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { 
   Container, Typography, CssBaseline, 
-  ThemeProvider, createTheme, Box, Paper 
+  ThemeProvider, createTheme, Box, Paper
 } from '@mui/material';
 import RequestForm from './components/RequestForm';
 import ResponseDisplay from './components/ResponseDisplay';
-import RequestHistory from './components/RequestHistory';
+import CollectionViewer from 'src\components\CollectionViewer';
 
 const darkTheme = createTheme({
   palette: {
@@ -28,28 +28,23 @@ const darkTheme = createTheme({
 
 function App() {
   const [response, setResponse] = useState(null);
-  const [history, setHistory] = useState([]);
+  const [currentRequest, setCurrentRequest] = useState(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const handleResponse = (responseData, requestConfig) => {
     setResponse(responseData);
     if (requestConfig) {
-      setHistory(prev => [
-        { 
-          id: Date.now(), 
-          method: requestConfig.method, 
-          url: requestConfig.url,
-          time: new Date().toLocaleTimeString(),
-          config: requestConfig
-        },
-        ...prev.slice(0, 9) // Keep only last 10 items
-      ]);
+      setCurrentRequest({
+        method: requestConfig.method,
+        url: requestConfig.url,
+        headers: requestConfig.headers,
+        body: requestConfig.data || ''
+      });
     }
   };
 
-  const handleSelectHistory = (item) => {
-    // This would need to be implemented to populate the request form
-    console.log('Selected history item:', item);
-    // You would need to pass this to RequestForm or lift state up
+  const refreshCollections = () => {
+    setRefreshKey(prev => prev + 1);
   };
 
   return (
@@ -60,23 +55,32 @@ function App() {
           API Tester
         </Typography>
         <Box display="flex" gap={4} sx={{ flexDirection: { xs: 'column', md: 'row' } }}>
+          {/* Collections Sidebar */}
+          <Box width={{ md: 350 }} sx={{ width: { xs: '100%', md: 350 } }}>
+            <Paper elevation={3} sx={{ height: 'calc(100vh - 200px)', display: 'flex', flexDirection: 'column' }}>
+              <CollectionViewer
+                key={refreshKey}
+                onSelectRequest={(request) => {
+                  setCurrentRequest(request);
+                  if (request.response) {
+                    setResponse(request.response);
+                  }
+                }}
+              />
+            </Paper>
+          </Box>
+
+          {/* Main Content */}
           <Box flex={1} minWidth={0}>
             <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
-              <RequestForm onResponse={handleResponse} />
+              <RequestForm 
+                onResponse={handleResponse} 
+                initialRequest={currentRequest}
+                onSaveSuccess={refreshCollections}
+              />
             </Paper>
             <Paper elevation={3} sx={{ p: 3 }}>
               <ResponseDisplay response={response} />
-            </Paper>
-          </Box>
-          <Box width={{ md: 350 }} sx={{ width: { xs: '100%', md: 350 } }}>
-            <Paper elevation={3} sx={{ p: 2, height: '100%' }}>
-              <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
-                Request History
-              </Typography>
-              <RequestHistory 
-                history={history} 
-                onSelect={handleSelectHistory}
-              />
             </Paper>
           </Box>
         </Box>
