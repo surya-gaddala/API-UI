@@ -1,12 +1,17 @@
 import React, { useState } from 'react';
 import { 
   Container, Typography, CssBaseline, 
-  ThemeProvider, createTheme, Box, Paper
+  ThemeProvider, createTheme, Box, Paper,
+  GlobalStyles
 } from '@mui/material';
 import RequestForm from './components/RequestForm';
 import ResponseDisplay from './components/ResponseDisplay';
-import CollectionViewer from "./components/collectionviewer";
-
+import CollectionViewer from './components/collectionviewer';
+import '@fontsource/roboto/300.css';
+import '@fontsource/roboto/400.css';
+import '@fontsource/roboto/500.css';
+import '@fontsource/roboto/700.css';
+import '@fontsource/roboto-mono/400.css';
 
 const darkTheme = createTheme({
   palette: {
@@ -24,7 +29,28 @@ const darkTheme = createTheme({
   },
   typography: {
     fontFamily: 'Roboto, sans-serif',
+    h4: {
+      fontWeight: 700,
+      letterSpacing: 0.5
+    }
   },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          textTransform: 'none',
+          borderRadius: 8
+        }
+      }
+    },
+    MuiChip: {
+      styleOverrides: {
+        root: {
+          fontWeight: 600
+        }
+      }
+    }
+  }
 });
 
 function App() {
@@ -51,14 +77,27 @@ function App() {
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
+      <GlobalStyles styles={{
+        body: { backgroundColor: '#121212' },
+        '*::-webkit-scrollbar': { width: '8px', height: '8px' },
+        '*::-webkit-scrollbar-thumb': { backgroundColor: '#555', borderRadius: '4px' }
+      }} />
       <Container maxWidth="xl" sx={{ py: 4 }}>
-        <Typography variant="h3" gutterBottom sx={{ fontWeight: 'bold', mb: 4 }}>
-          API Tester
+        <Typography variant="h4" gutterBottom sx={{ mb: 4 }}>
+          <Box component="span" sx={{ color: 'primary.main' }}>API</Box> Tester
         </Typography>
-        <Box display="flex" gap={4} sx={{ flexDirection: { xs: 'column', md: 'row' } }}>
+        <Box display="flex" gap={4} sx={{ 
+          flexDirection: { xs: 'column', md: 'row' },
+          '& > *': { minWidth: 0 } // Prevent overflow
+        }}>
           {/* Collections Sidebar */}
           <Box width={{ md: 350 }} sx={{ width: { xs: '100%', md: 350 } }}>
-            <Paper elevation={3} sx={{ height: 'calc(100vh - 200px)', display: 'flex', flexDirection: 'column' }}>
+            <Paper elevation={3} sx={{ 
+              height: { md: 'calc(100vh - 200px)' },
+              display: 'flex', 
+              flexDirection: 'column',
+              overflow: 'hidden'
+            }}>
               <CollectionViewer
                 key={refreshKey}
                 onSelectRequest={(request) => {
