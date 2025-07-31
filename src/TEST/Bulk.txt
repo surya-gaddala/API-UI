@@ -1,0 +1,323 @@
+perform bulk action
+    [Documentation]    performs bulk action
+    [Arguments]    ${service}    ${status}    ${action}
+    Click Web Element    ${BULK_ACTIONS_BTN}
+    #click on new bulk action
+    Click Web Element    ${NEW_BULK_ACTION_BTN}
+    #Validate Bulk Action popup title
+#    Validate equal_value from JSON by language and key  ${NewBulkAction_Popup_Title}  newBulkAction
+    Clean up Downloads directory in Project directory before new download  ${DOWNLOADS_PATH}
+    Click Web Element  ${SAMPLE_CSV_LINK_BULK_ACTION}
+    #Wait Until File Exists  ${BULK_FILE_PATH}  timeout=20s
+    Wait Until Keyword Succeeds    20s    2s    File Should Exist    ${BULK_FILE_PATH}
+    Log  Bulk actions template is downloaded.\n  console=True
+    Sleep     2s
+    #Read and Write IMEIs to downloaded bulk action template
+    #Write to first column of bulk action template  ${BULK_FILE_PATH}  ${IMEI_FILE_PATH}
+    Read IMEI data from file and write to bulk action template  ${SCRIPT_PATH}  ${IMEI_FILE_PATH}  ${BULK_FILE_PATH}  ${IMEI_VAR_BULK_NAME}
+    Sleep     5s
+    select bulk status and submit    ${service}    ${status}    ${action}
+    
+select bulk status and submit    
+    [Arguments]    ${service}    ${status}    ${action}    ${days}
+    Upload File    ${UPLOAD_ACTIONLOG}    ${BULK_FILE_PATH}
+    Click Web Element    ${APPLY_FOR_SERVICE_DD}
+    IF    '${service}' == 'supplyChain'
+        Wait And Click    ${SUPPLY_CHAIN_APPLY_FOR_SERVICE_DD}    3
+        IF    '${status}' == 'protected'
+            Wait And Click    ${PROTECTED_TOGGLE_BTN_SUPPLY_CHAIN}    3
+            Wait And Click    ${SELECT_ACTION_DD_1}    3
+            IF     '${action}' == 'deregister'
+                Wait And Click    ${SUPLY_CHAIN_PROTECTED_DEREGISTER_DD}    3
+            ELSE IF    '${action}' == 'deliver'
+                Wait And Click    ${SUPLY_CHAIN_PROTECTED_DELIVER_DD}    3
+            ELSE
+                Fail    Invalid status name: ${action}
+            END
+        ELSE IF    '${status}' == 'locked'
+            Wait And Click    ${LOCKED_TOGGLE_BTN_SUPPLY_CHAIN}    3
+            Wait And Click    ${SELECT_ACTION_DD_1}    3
+            IF     '${action}' == 'deregister'
+                Wait And Click    ${SUPLY_CHAIN_LOCKED_DEREGISTER_DD}    3
+            ELSE IF    '${action}' == 'deliver'
+                Wait And Click    ${SUPLY_CHAIN_LOCKED_DELIVER_DD}    3
+            ELSE
+                Fail    Invalid status name: ${action}
+            END
+        ELSE IF    '${status}' == 'delivered'
+            Wait And Click    ${DELIVERED_TOGGLE_BTN_SUPPLY_CHAIN}    3
+            Wait And Click    ${SELECT_ACTION_DD_1}    3
+            IF     '${action}' == 'deregister'
+                Wait And Click    ${SUPLY_CHAIN_DELIVERED_DEREGISTER_DD}    3
+            ELSE
+                Fail    Invalid status name: ${action}
+            END
+        ELSE
+            Fail    Invalid status name: ${status}
+        END
+    ELSE IF    '${service}' == 'prepaid'
+        Wait And Click    ${PREPAID_APPLY_FOR_SERVICE_DD}    3
+        IF    '${status}' == 'readyForUse'
+            Wait And Click    ${READY_FOR_USE_PREPAID_TOGGLE_BTN}    3
+            Wait And Click    ${SELECT_ACTION_DD_1}    3
+            IF     '${action}' == 'deregister'
+                Wait And Click    ${PREPAID_READY_USE_DEREGISTER_DD}    3
+            ELSE IF    '${action}' == 'reload'
+                Wait And Click    ${PREAPID_READ_USE_RELOAD_DD}    3
+            ELSE
+                Fail    Invalid status name: ${action}
+            END
+        ELSE IF    '${status}' == 'locked'
+            Wait And Click    ${LOCKED_PREPAID_TOGGLE_BTN}    3
+            Wait And Click    ${SELECT_ACTION_DD_1}    3
+            IF     '${action}' == 'deregister'
+                Wait And Click    ${PREPAID_LOCKED_DEREGISTER_DD}    3
+            ELSE IF    '${action}' == 'unlock'
+                Wait And Click    ${PREPAID_LOCKED_UNLOCK_DD}    3
+            ELSE IF    '${action}' == 'lockMessage'
+                Wait And Click    ${PREPAID_LOCKED_LOCK_MESSAGE_DD}    3
+                Wait And Click    ${SELECT_ACTION_DD_2}    3
+            ELSE
+                Fail    Invalid status name: ${action}
+            END
+        ELSE IF    '${status}' == 'active'
+            Wait And Click    ${ACTIVE_PREPAID_TOGGLE_BTN}    3
+            Wait And Click    ${SELECT_ACTION_DD_1}    3
+            IF     '${action}' == 'deregister'
+                Wait And Click    ${PREPAID_ACTIVE_DEREGISTER_DD}    3
+            ELSE IF    '${action}' == 'lock'
+                Wait And Click    ${PREPAID_ACTIVE_LOCK_DD}    3
+            ELSE IF    '${action}' == 'release'
+                Wait And Click    ${PREPAID_ACTIVE_RELEASE_DD}    3
+            ELSE IF    '${action}' == 'sendMessage'
+                Wait And Click    ${PREPAID_ACTIVE_SEND_MESSAGE_DD}    3
+                Wait And Click    ${SELECT_ACTION_DD_2}    3
+                    IF    '${days}' == '1'
+                        Wait And Click    ${PREPAID_ACTIVE_SEND_payment1_DD}    3
+                    ELSE IF    '${days}' == '3'
+                        Wait And Click    ${PREPAID_ACTIVE_SEND_payment3_DD}    3
+                    ELSE IF    '${days}' == '7'
+                        Wait And Click    ${PREPAID_ACTIVE_SEND_payment7_DD}    3
+                    ELSE IF    '${days}' == '0'
+                        Wait And Click    ${PREPAID_ACTIVE_SEND_DEVICE_RES_DD}    3
+                    ELSE
+                        Fail    Invalid days: ${days}
+                    END
+            ELSE IF    '${action}' == 'reload'
+                Wait And Click    ${PREPAID_ACTIVE_RELOAD_DD}    3
+            ELSE
+                Fail    Invalid status name: ${action}
+            END
+        ELSE
+            Fail    Invalid status name: ${status}
+        END
+    ELSE IF    '${service}' == 'postpaid'
+
+        Wait And Click    ${POSTPAID_APPLY_FOR_SERVICE_DD}    3
+        IF    '${status}' == 'readyForUse'
+            Wait And Click    ${READY_FOR_USE_POSTPAID_TOGGLE_BTN}    3
+            Wait And Click    ${SELECT_ACTION_DD_1}    3
+            IF    '${action}' == 'deregister'
+                Wait And Click    ${POSTPAID_READY_USE_DEREGISTER_DD}    3
+            ELSE
+                Fail    Invalid action name: ${action}
+            END
+        ELSE IF    '${status}' == 'locked'
+            Wait And Click    ${LOCKED_POSTPAID_TOGGLE_BTN}    3
+            Wait And Click    ${SELECT_ACTION_DD_1}    3
+            IF    '${action}' == 'deregister'
+                Wait And Click    ${POSTPAID_LOCKED_DEREGISTER_DD}    3
+            ELSE IF    '${action}' == 'unlock'
+                Wait And Click    ${POSTPAID_LOCKED_UNLOCK_DD}    3
+            ELSE IF    '${action}' == 'lockMessage'
+                Wait And Click    ${POSTPAID_LOCKED_LOCK_MESSAGE_DD}    3
+                Wait And Click    ${SELECT_ACTION_DD_2}    3
+                IF    '${days}' == '0'
+                    Wait And Click    ${PREPAID_LOCKED_DEVICE_RES_DD}    3
+                ELSE
+                    Fail    Invalid days : ${days}
+                END
+            ELSE
+                Fail    Invalid action name: ${action}
+            END
+        ELSE IF    '${status}' == 'active'
+            Wait And Click    ${ACTIVE_POSTPAID_TOGGLE_BTN}    3
+            Wait And Click    ${SELECT_ACTION_DD_1}    3
+            IF    '${action}' == 'deregister'
+                Wait And Click    ${POSTPAID_ACTIVE_DEREGISTER_DD}    3
+            ELSE IF    '${action}' == 'lock'
+                Wait And Click    ${POSTPAID_ACTIVE_LOCK_DD}    3
+            ELSE IF    '${action}' == 'release'
+                Wait And Click    ${POSTPAID_ACTIVE_RELEASE_DD}    3
+            ELSE IF    '${action}' == 'sendMessage'
+                Wait And Click    ${POSTPAID_ACTIVE_SEND_MESSAGE_DD}    3
+                Wait And Click    ${SELECT_ACTION_DD_2}    3
+                IF    '${days}' == '1'
+                    Wait And Click    ${POSTPAID_ACTIVE_SEND_payment1_DD}    3
+                ELSE IF    '${days}' == '3'
+                    Wait And Click    ${POSTPAID_ACTIVE_SEND_payment3_DD}    3
+                ELSE IF    '${days}' == '7'
+                    Wait And Click    ${POSTPAID_ACTIVE_SEND_payment7_DD}    3
+                ELSE IF    '${days}' == '0'
+                    Wait And Click    ${POSTPAID_ACTIVE_SEND_DEVICE_RES_DD}    3
+                ELSE
+                    Fail    Invalid days: ${days}
+                END
+            ELSE
+                Fail    Invalid action name: ${action}
+            END
+        ELSE
+            Fail    Invalid status name: ${status}
+        END
+    ELSE IF    '${service}' == 'simControl'
+
+        Wait And Click    ${SIM_CONTROL_APPLY_FOR_SERVICE_DD}    3
+        IF    '${status}' == 'readyForUse'
+            Wait And Click    ${READY_FOR_USE_SIM_CONTROL_TOGGLE_BTN}    3
+            Wait And Click    ${SELECT_ACTION_DD_1}    3
+            IF    '${action}' == 'deregister'
+                Wait And Click    ${SIM_READY_FOR_USE_DEREGISTER_DD}    3
+            ELSE
+                Fail    Invalid action name: ${action}
+            END
+        ELSE IF    '${status}' == 'active'
+            Wait And Click    ${ACTIVE_SIM_CONTROL_TOGGLE_BTN}    3
+            Wait And Click    ${SELECT_ACTION_DD_1}    3
+            IF    '${action}' == 'deregister'
+                Wait And Click    ${SIM_ACTIVE_DEREGISTER_DD}    3
+            ELSE IF    '${action}' == 'release'
+                Wait And Click    ${SIM_ACTIVE_RELEASE_DD}    3
+            ELSE IF    '${action}' == 'sendMessage'
+                Wait And Click    ${SIM_ACTIVE_SEND_MESSAGE_DD}    3
+                Wait And Click    ${SELECT_ACTION_DD_2}    3
+                IF    '${days}' == '1'
+                    Wait And Click    ${SIM_ACTIVE_SEND_payment1_DD}    3
+                ELSE IF    '${days}' == '3'
+                    Wait And Click    ${SIM_ACTIVE_SEND_payment3_DD}    3
+                ELSE IF    '${days}' == '7'
+                    Wait And Click    ${SIM_ACTIVE_SEND_payment7_DD}    3
+                ELSE IF    '${days}' == '0'
+                    Wait And Click    ${SIM_ACTIVE_SEND_DEVICE_RES_DD}    3
+                ELSE
+                    Fail    Invalid days: ${days}
+                END
+            ELSE  
+                Fail    Invalid action name: ${action}
+            END
+        ELSE
+            Fail    Invalid status name: ${status}
+        END
+    ELSE IF    '${service}' == 'theftProtection'
+
+        Wait And Click    ${THEFT_PROTECTION_APPLY_FOR_SERVICE_DD}    3
+        IF    '${status}' == 'protected'
+            Wait And Click    ${PROTECTED_THEFT_PROTECTION_TOGGLE_BTN}    3
+            Wait And Click    ${SELECT_ACTION_DD_1}    3
+            IF    '${action}' == 'deregister'
+                Wait And Click    ${THEFT_PROTECTED_DEREGISTER_DD}    3
+            ELSE IF    '${action}' == 'reportStolen'
+                Wait And Click    ${THEFT_PROTECTED_REPORT_STOLEN_DD}    3
+            ELSE
+                Fail    Invalid action name: ${action}
+            END
+        ELSE IF    '${status}' == 'active'
+            Wait And Click    ${ACTIVE_THEFT_PROTECTION_TOGGLE_BTN}    3
+            Wait And Click    ${SELECT_ACTION_DD_1}    3
+            IF    '${action}' == 'lock'
+                Wait And Click    ${THEFT_ACTIVE_LOCK_DD}    3
+            ELSE IF    '${action}' == 'release'
+                Wait And Click    ${THEFT_ACTIVE_RELEASE_DD}    3
+            ELSE IF    '${action}' == 'sendMessage'
+                Wait And Click    ${THEFT_ACTIVE_SEND_MESSAGE_DD}    3
+                Wait And Click    ${SELECT_ACTION_DD_2}    3
+                IF    '${days}' == '1'
+                    Wait And Click    ${THEFT_ACTIVE_SEND_payment1_DD}    3
+                ELSE IF    '${days}' == '3'
+                    Wait And Click    ${THEFT_ACTIVE_SEND_payment3_DD}    3
+                ELSE IF    '${days}' == '7'
+                    Wait And Click    ${THEFT_ACTIVE_SEND_payment7_DD}    3
+                ELSE IF    '${days}' == '0'
+                    Wait And Click    ${THEFT_ACTIVE_SEND_DEVICE_RES_DD}    3
+                ELSE
+                    Fail    Invalid days: ${days}
+                END
+            ELSE
+                Fail    Invalid action name: ${action}
+            END
+        ELSE IF    '${status}' == 'locked'
+            Wait And Click    ${LOCKED_THEFT_PROTECTION_TOGGLE_BTN}    3
+            Wait And Click    ${SELECT_ACTION_DD_1}    3
+            IF    '${action}' == 'deregister'
+                Wait And Click    ${THEFT_LOCKED_DEREGISTER_DD}    3
+            ELSE IF    '${action}' == 'unlock'
+                Wait And Click    ${THEFT_LOCKED_UNLOCK_DD}    3
+            ELSE IF    '${action}' == 'resetToProtected'
+                Wait And Click    ${THEFT_LOCKED_RESET_TO_PROTECTED_DD}    3
+            ELSE
+                Fail    Invalid action name: ${action}
+            END
+        ELSE
+            Fail    Invalid status name: ${status}
+        END
+    ELSE IF    '${service}' == 'subsidyProtection'
+
+        Wait And Click    ${SUBSIDY_PROTECTION_APPLY_FOR_SERVICE_DD}    3
+        IF    '${status}' == 'readyForUse'
+            Wait And Click    ${READY_FOR_USE_SUBSIDY_TOGGLE_BTN}    3
+            Wait And Click    ${SELECT_ACTION_DD_1}    3
+            IF     '${action}' == 'deregister'
+                Wait And Click    ${SUBSIDY_READY_FOR_USE_DEREGISTER_DD}    3
+            ELSE
+                Fail    Invalid status name: ${action}
+            END
+        ELSE IF    '${status}' == 'networkLocked'
+            Wait And Click    ${NETWORK_LOCKED_SUBSIDY_TOGGLE_BTN}    3
+            Wait And Click    ${SELECT_ACTION_DD_1}    3
+            IF     '${action}' == 'deregister'
+                Wait And Click    ${SUBSIDY_NETWORK_LOCKED_DEREGISTER_DD}    3
+            ELSE
+                Fail    Invalid status name: ${action}
+            END
+        ELSE IF    '${status}' == 'active'
+            Wait And Click    ${ACTIVE_SUBSIDY_TOGGLE_BTN}    3
+            Wait And Click    ${SELECT_ACTION_DD_1}    3
+            IF     '${action}' == 'release'
+                Wait And Click    ${SUBSIDY_ACTIVE_RELEASE_DD}    3
+            ELSE
+                Fail    Invalid status name: ${action}
+            END
+        ELSE
+            Fail    Invalid status name: ${status}
+        END
+    ELSE IF    '${service}' == 'inventory'
+        Wait And Click    ${INVENTORY_APPLY_FOR_SERVICE_DD}    3
+        IF    '${status}' == 'idle'
+            Wait And Click    ${IDLE_TOGGLE_BTN}    3
+            Wait And Click    ${SELECT_ACTION_DD_1}    3
+            IF     '${action}' == 'supplyChain'
+                Wait And Click    ${REGISTER_SUPPLY_CHAIN_DD}    3
+            ELSE IF    '${action}' == 'prepaid'
+                Wait And Click    ${REGISTER_PREPAID_DD}    3
+            ELSE IF    '${action}' == 'postpaid'
+                Wait And Click    ${REGISTER_POSTPAID_DD}    3
+            ELSE  IF    '${action}' == 'simControl'
+                Wait And Click    ${REGISTER_SIM_CONTROL_DD}    3
+            ELSE  IF    '${action}' == 'theftprotection'
+                Wait And Click    ${REGISTER_THEFT_PROTECTION_DD}    3
+            ELSE  IF    '${action}' == 'subsidyProtection'
+                Wait And Click    ${REGISTER_SUBSIDY_PROTECTION_DD}    3
+            ELSE  IF    '${action}' == 'archive'
+                Wait And Click    ${REGISTER_ARCHIVE_DD}    3
+            ELSE
+                Fail    Invalid status name: ${action}
+            END
+        ELSE
+            Fail    Invalid status name: ${status}
+        END
+    ELSE
+        Fail    Invalid service name: ${service}
+    END
+    Log  Clicked ${service}    console= True
+    Log  Clicked ${status}    console= True
+
+    Click Web Element    ${SUBMIT_NEW_BULK_ACTION_POPUP_BTN}
